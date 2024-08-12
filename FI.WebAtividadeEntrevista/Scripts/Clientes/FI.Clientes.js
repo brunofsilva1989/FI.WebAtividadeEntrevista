@@ -1,7 +1,7 @@
 ﻿let beneficiarios = [];
 
 $(document).ready(function () {
-    
+
     $('#formCadastro').submit(function (e) {
         e.preventDefault();
 
@@ -11,13 +11,15 @@ $(document).ready(function () {
             ModalDialog("Ocorreu um erro", "CPF inválido.");
             return;
         }
-        
+
+
         $('#Beneficiarios').val(JSON.stringify(beneficiarios));
 
         console.log($('#Beneficiarios').val());
-        
+
+
         $.ajax({
-            url: urlPost, 
+            url: urlPost,
             method: "POST",
             data: JSON.stringify({
                 "Nome": $('#formCadastro').find("#Nome").val(),
@@ -41,7 +43,7 @@ $(document).ready(function () {
                     beneficiarios = [];
                     atualizarTabelaBeneficiarios();
                 } else {
-                    ModalDialog("Erro", r.mensagem);
+                    ModalDialog("Erro", r.mensagem || "Erro ao processar o cadastro.");
                 }
             },
             error: function (r) {
@@ -137,23 +139,27 @@ function ModalDialog(titulo, texto) {
  * @returns {boolean} Retorna `true` se o CPF for válido, caso contrário, `false`.
  */
 function validarCPF(cpf) {
-    
+
     cpf = cpf.replace(/[^\d]/g, '');
-    
+
+
     if (cpf.length !== 11) return false;
-    
+
+
     if (/^(\d)\1+$/.test(cpf)) return false;
-    
+
+
     const calcularDigito = (base, peso) => {
         const soma = base.split('').reduce((acc, num, i) => acc + parseInt(num) * (peso - i), 0);
         const resto = (soma * 10) % 11;
         return resto === 10 || resto === 11 ? 0 : resto;
     };
-    
+
+
     const digito1 = calcularDigito(cpf.substring(0, 9), 10);
     const digito2 = calcularDigito(cpf.substring(0, 10), 11);
 
-    
+
     return digito1 === parseInt(cpf[9]) && digito2 === parseInt(cpf[10]);
 }
 

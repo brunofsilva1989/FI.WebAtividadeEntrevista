@@ -1,6 +1,6 @@
 ﻿$(document).ready(function () {
     if (obj) {
-        
+
         $('#formCadastro #Nome').val(obj.Nome);
         $('#formCadastro #Sobrenome').val(obj.Sobrenome);
         $('#formCadastro #CPF').val(obj.CPF);
@@ -11,7 +11,7 @@
         $('#formCadastro #Logradouro').val(obj.Logradouro);
         $('#formCadastro #Email').val(obj.Email);
         $('#formCadastro #Telefone').val(obj.Telefone);
-        
+
         if (obj.Beneficiarios && obj.Beneficiarios.length > 0) {
             obj.Beneficiarios.forEach((beneficiario, index) => {
                 adicionarBeneficiarioNaTabela(beneficiario, index);
@@ -22,13 +22,13 @@
     $('#formCadastro').submit(function (e) {
         e.preventDefault();
 
-        
-        if ($('#tabelaBeneficiarios tbody tr').length === 0 && !$('#formCadastro #Id').val()) {            
+
+        if ($('#tabelaBeneficiarios tbody tr').length === 0 && !$('#formCadastro #Id').val()) {
             ModalDialog("Erro", "Nenhum beneficiário foi informado.");
-            return;  
+            return;
         }
 
-        
+
         let beneficiarios = [];
         $('#tabelaBeneficiarios tbody tr').each(function () {
             let cpf = $(this).find('td:eq(0)').text();
@@ -55,14 +55,17 @@
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             success: function (r) {
+                console.log(r); // Adicione isso para verificar a resposta
                 if (r.sucesso) {
                     ModalDialog("Sucesso!", r.mensagem);
                     $("#formCadastro")[0].reset();
-                    window.location.href = urlRetorno;
+                    beneficiarios = [];
+                    atualizarTabelaBeneficiarios();
                 } else {
-                    ModalDialog("Erro", r.mensagem);
+                    ModalDialog("Erro", r.mensagem || "Erro ao processar o cadastro.");
                 }
             },
+
             error: function (r) {
                 if (r.status == 400) {
                     ModalDialog("Erro", r.responseJSON.mensagem || "Erro desconhecido.");

@@ -32,28 +32,26 @@ namespace WebAtividadeEntrevista.Controllers
         /// <exception cref="Exception"></exception>
         [HttpPost]
         public JsonResult Incluir(ClienteModel model)
-        {            
-           
-            BoCliente bo = new BoCliente();
-
-            if (bo.VerificarExistencia(model.CPF))
+        {
+            try
             {
-                Response.StatusCode = 400;
-                throw new Exception("CPF já cadastrado para outro cliente.");
-            }
+                BoCliente bo = new BoCliente();
 
-            if (!this.ModelState.IsValid)
-            {
-                List<string> erros = (from item in ModelState.Values
-                                      from error in item.Errors
-                                      select error.ErrorMessage).ToList();
+                if (bo.VerificarExistencia(model.CPF))
+                {
+                    Response.StatusCode = 400;
+                    return Json(new { sucesso = false, mensagem = "CPF já cadastrado para outro cliente." });
+                }
 
-                Response.StatusCode = 400;
-                return Json(string.Join(Environment.NewLine, erros));
-            }
-            else
-            {
-                
+                if (!this.ModelState.IsValid)
+                {
+                    List<string> erros = (from item in ModelState.Values
+                                          from error in item.Errors
+                                          select error.ErrorMessage).ToList();
+
+                    Response.StatusCode = 400;
+                    return Json(new { sucesso = false, mensagem = string.Join(Environment.NewLine, erros) });
+                }
 
                 model.Id = bo.Incluir(new Cliente()
                 {
@@ -72,14 +70,13 @@ namespace WebAtividadeEntrevista.Controllers
                 if (model.Beneficiarios != null && model.Beneficiarios.Count > 0)
                 {
                     BoBeneficiario boBeneficiario = new BoBeneficiario();
-                    
+
                     foreach (var beneficiario in model.Beneficiarios)
                     {
-
                         if (bo.VerificarExistencia(beneficiario.CPF))
                         {
                             Response.StatusCode = 400;
-                            throw new Exception("CPF já cadastrado para outro beneficiário deste cliente.");
+                            return Json(new { sucesso = false, mensagem = "CPF já cadastrado para outro beneficiário deste cliente." });
                         }
 
                         boBeneficiario.Incluir(new Beneficiario()
@@ -91,7 +88,12 @@ namespace WebAtividadeEntrevista.Controllers
                     }
                 }
 
-                return Json("Cadastro efetuado com sucesso");
+                return Json(new { sucesso = true, mensagem = "Cadastro efetuado com sucesso" });
+            }
+            catch (Exception ex)
+            {
+                Response.StatusCode = 500;
+                return Json(new { sucesso = false, mensagem = ex.Message });
             }
         }
 
@@ -114,12 +116,11 @@ namespace WebAtividadeEntrevista.Controllers
                 return Json(new { sucesso = false, mensagem = string.Join(Environment.NewLine, erros) });
             }
 
+            // Verificação para garantir que haja beneficiários
             if (model.Beneficiarios == null || model.Beneficiarios.Count == 0)
             {
-                if (model.Id == 0) 
-                {
-                    
-                }
+                Response.StatusCode = 400;
+                return Json(new { sucesso = false, mensagem = "Nenhum beneficiário foi informado." });
             }
 
             try
@@ -141,12 +142,12 @@ namespace WebAtividadeEntrevista.Controllers
                     Telefone = model.Telefone
                 });
 
-                
                 BoBeneficiario boBeneficiario = new BoBeneficiario();
                 foreach (var beneficiario in model.Beneficiarios)
                 {
                     if (beneficiario.Id == 0)
-                    {                        
+                    {
+                        // Inserir novo beneficiário
                         boBeneficiario.Incluir(new Beneficiario()
                         {
                             CPF = beneficiario.CPF,
@@ -155,7 +156,8 @@ namespace WebAtividadeEntrevista.Controllers
                         });
                     }
                     else
-                    {                        
+                    {
+                        // Alterar beneficiário existente
                         boBeneficiario.Alterar(new Beneficiario()
                         {
                             Id = beneficiario.Id,
@@ -166,11 +168,12 @@ namespace WebAtividadeEntrevista.Controllers
                     }
                 }
 
-                return Json("Cadastro alterado com sucesso.");
+                return Json(new { sucesso = true, mensagem = "Cadastro alterado com sucesso." });
             }
             catch (Exception ex)
-            {                
-                return Json("Cadastro Gravado.");
+            {
+                Response.StatusCode = 500;
+                return Json(new { sucesso = false, mensagem = "Erro interno no servidor: " + ex.Message });
             }
         }
 
