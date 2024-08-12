@@ -1,7 +1,7 @@
 ﻿let beneficiarios = [];
 
 $(document).ready(function () {
-    // Quando o formulário do cliente for submetido
+    
     $('#formCadastro').submit(function (e) {
         e.preventDefault();
 
@@ -11,15 +11,13 @@ $(document).ready(function () {
             ModalDialog("Ocorreu um erro", "CPF inválido.");
             return;
         }
-
-        // Converte a lista de beneficiários para JSON
+        
         $('#Beneficiarios').val(JSON.stringify(beneficiarios));
 
         console.log($('#Beneficiarios').val());
-
-        // Envia o formulário de cadastro do cliente com os beneficiários
+        
         $.ajax({
-            url: urlPost, // URL do endpoint para salvar o cliente
+            url: urlPost, 
             method: "POST",
             data: JSON.stringify({
                 "Nome": $('#formCadastro').find("#Nome").val(),
@@ -139,27 +137,23 @@ function ModalDialog(titulo, texto) {
  * @returns {boolean} Retorna `true` se o CPF for válido, caso contrário, `false`.
  */
 function validarCPF(cpf) {
-    // Remove caracteres especiais (pontos e hífens)
+    
     cpf = cpf.replace(/[^\d]/g, '');
-
-    // Verifica se o CPF tem 11 dígitos
+    
     if (cpf.length !== 11) return false;
-
-    // Verifica se todos os dígitos são iguais (ex: 111.111.111-11)
+    
     if (/^(\d)\1+$/.test(cpf)) return false;
-
-    // Função auxiliar para calcular os dígitos verificadores
+    
     const calcularDigito = (base, peso) => {
         const soma = base.split('').reduce((acc, num, i) => acc + parseInt(num) * (peso - i), 0);
         const resto = (soma * 10) % 11;
         return resto === 10 || resto === 11 ? 0 : resto;
     };
-
-    // Calcula os dois dígitos verificadores
+    
     const digito1 = calcularDigito(cpf.substring(0, 9), 10);
     const digito2 = calcularDigito(cpf.substring(0, 10), 11);
 
-    // Verifica se os dígitos calculados conferem com os dígitos do CPF
+    
     return digito1 === parseInt(cpf[9]) && digito2 === parseInt(cpf[10]);
 }
 

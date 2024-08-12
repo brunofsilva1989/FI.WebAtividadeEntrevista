@@ -3,12 +3,12 @@ $(document).ready(function () {
     console.log('Forms.cshtml carregado');
 
     $('#btnIncluir').click(function () {
-        // Intercepta a submissão do formulário de beneficiário
+        
         $('#formBeneficiario').submit();
     });
 
     $('#formBeneficiario').submit(function (e) {
-        console.log("Submissão interceptada"); // Adicione este log
+        console.log("Submissão interceptada"); 
         e.preventDefault();
 
         let cpf = $(this).find("#CPF").val();
@@ -22,20 +22,17 @@ $(document).ready(function () {
         }
 
         console.log("CPF válido, prosseguindo com a inclusão");
-
-        // Verifica se o CPF já existe na lista de beneficiários
+        
         if (beneficiarios.some(b => b.CPF === cpf)) {
             ModalDialog("Ocorreu um erro", "Este CPF já foi adicionado para outro beneficiário.");
             return;
         }
-
-        // Adiciona o beneficiário à lista de beneficiários temporários
+        
         beneficiarios.push({ CPF: cpf, Nome: nome });
-
-        // Atualiza a tabela de beneficiários no modal
+        
         atualizarTabelaBeneficiarios();
 
-        // Limpa o formulário do modal
+        
         $("#formBeneficiario")[0].reset();
     });
 });
