@@ -1,0 +1,14 @@
+﻿
+@{
+    ViewBag.Title = "Beneficiários";
+}
+@section scripts{
+<script>
+    var urlAlteracao = '@Url.Action("Alterar", "Beneficiario", new { area = "" })';
+    var urlClienteList = '@Url.Action("ClienteList", "Beneficiario", new { area = "" })';
+
+</script>
+    @Scripts.Render("~/bundles/listBeneficiarios")
+}
+<h2>@Html.Raw(ViewBag.Title)</h2>
+<table id="gridBeneficiarios" class="table"></table>

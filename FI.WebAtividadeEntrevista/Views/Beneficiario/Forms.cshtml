@@ -1,0 +1,55 @@
+﻿<body>
+    <div class="modal fade" id="beneficiarioModal" tabindex="-1" role="dialog" aria-labelledby="beneficiarioModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="beneficiarioModalLabel">Beneficiários</h5>
+                    <button type="button" class="close" style="margin-top: -18px;" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">                    
+                    <form id="formBeneficiario" method="post">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="CPF">CPF:</label>
+                                    <input required="required" type="text" class="form-control" id="CPF" name="CPF" placeholder="Ex.: 012.123.010-00" maxlength="14">
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="form-group">
+                                    <label for="Nome">Nome:</label>
+                                    <input required="required" type="text" class="form-control" id="Nome" name="Nome" placeholder="Ex.: João" maxlength="50">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <button type="button" class="btn btn-sm btn-success" style="margin-top: 25px;" id="btnIncluir">Incluir</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+
+                    <table class="table table-striped" id="tabelaBeneficiarios">
+                        <thead>
+                            <tr>
+                                <th>CPF</th>
+                                <th>Nome</th>
+                                <th class="w-100 text-end">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+
