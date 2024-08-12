@@ -1,5 +1,6 @@
 ﻿$(document).ready(function () {
     if (obj) {
+        console.log("Carregando dados do cliente para alteração.");
 
         $('#formCadastro #Nome').val(obj.Nome);
         $('#formCadastro #Sobrenome').val(obj.Sobrenome);
@@ -22,12 +23,12 @@
     $('#formCadastro').submit(function (e) {
         e.preventDefault();
 
+        console.log("Iniciando submissão do formulário de alteração.");
 
         if ($('#tabelaBeneficiarios tbody tr').length === 0 && !$('#formCadastro #Id').val()) {
             ModalDialog("Erro", "Nenhum beneficiário foi informado.");
             return;
         }
-
 
         let beneficiarios = [];
         $('#tabelaBeneficiarios tbody tr').each(function () {
@@ -39,23 +40,25 @@
         $.ajax({
             url: urlPost,
             method: "POST",
-            data: {
-                "Nome": $(this).find("#Nome").val(),
-                "Sobrenome": $(this).find("#Sobrenome").val(),
-                "CPF": $(this).find("#CPF").val(),
-                "Nacionalidade": $(this).find("#Nacionalidade").val(),
-                "CEP": $(this).find("#CEP").val(),
-                "Estado": $(this).find("#Estado").val(),
-                "Cidade": $(this).find("#Cidade").val(),
-                "Logradouro": $(this).find("#Logradouro").val(),
-                "Email": $(this).find("#Email").val(),
-                "Telefone": $(this).find("#Telefone").val(),
+            data: JSON.stringify({
+                "Id": $('#formCadastro').find("#Id").val(),
+                "Nome": $('#formCadastro').find("#Nome").val(),
+                "Sobrenome": $('#formCadastro').find("#Sobrenome").val(),
+                "CPF": $('#formCadastro').find("#CPF").val(),
+                "Nacionalidade": $('#formCadastro').find("#Nacionalidade").val(),
+                "CEP": $('#formCadastro').find("#CEP").val(),
+                "Estado": $('#formCadastro').find("#Estado").val(),
+                "Cidade": $('#formCadastro').find("#Cidade").val(),
+                "Logradouro": $('#formCadastro').find("#Logradouro").val(),
+                "Email": $('#formCadastro').find("#Email").val(),
+                "Telefone": $('#formCadastro').find("#Telefone").val(),
                 "Beneficiarios": beneficiarios
-            },
+            }),
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             success: function (r) {
-                console.log(r); // Adicione isso para verificar a resposta
+                console.log("Resposta do servidor recebida:", r);
+
                 if (r.sucesso) {
                     ModalDialog("Sucesso!", r.mensagem);
                     $("#formCadastro")[0].reset();
@@ -67,6 +70,8 @@
             },
 
             error: function (r) {
+                console.error("Erro ao enviar os dados:", r);
+
                 if (r.status == 400) {
                     ModalDialog("Erro", r.responseJSON.mensagem || "Erro desconhecido.");
                 } else if (r.status == 500) {
