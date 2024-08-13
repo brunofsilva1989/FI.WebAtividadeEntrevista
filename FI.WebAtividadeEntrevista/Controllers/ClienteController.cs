@@ -35,6 +35,7 @@ namespace WebAtividadeEntrevista.Controllers
         {
             try
             {
+                
                 BoCliente bo = new BoCliente();
 
                 if (bo.VerificarExistencia(model.CPF))
@@ -106,6 +107,8 @@ namespace WebAtividadeEntrevista.Controllers
         [HttpPost]
         public JsonResult Alterar(ClienteModel model)
         {
+            BoCliente bo = new BoCliente();
+           
             if (!this.ModelState.IsValid)
             {
                 List<string> erros = (from item in ModelState.Values
@@ -114,19 +117,11 @@ namespace WebAtividadeEntrevista.Controllers
 
                 Response.StatusCode = 400;
                 return Json(new { sucesso = false, mensagem = string.Join(Environment.NewLine, erros) });
-            }
-
-            // Verificação para garantir que haja beneficiários
-            if (model.Beneficiarios == null || model.Beneficiarios.Count == 0)
-            {
-                Response.StatusCode = 400;
-                return Json(new { sucesso = false, mensagem = "Nenhum beneficiário foi informado." });
-            }
+            }           
 
             try
             {
-                // Prossiga com a alteração do cliente
-                BoCliente bo = new BoCliente();
+                               
                 bo.Alterar(new Cliente()
                 {
                     Id = model.Id,
@@ -141,30 +136,46 @@ namespace WebAtividadeEntrevista.Controllers
                     Email = model.Email,
                     Telefone = model.Telefone
                 });
-
-                BoBeneficiario boBeneficiario = new BoBeneficiario();
-                foreach (var beneficiario in model.Beneficiarios)
+                                
+                if (model.Beneficiarios != null && model.Beneficiarios.Count > 0)
                 {
-                    if (beneficiario.Id == 0)
+                    BoBeneficiario boBeneficiario = new BoBeneficiario();
+                    foreach (var beneficiario in model.Beneficiarios)
                     {
-                        // Inserir novo beneficiário
-                        boBeneficiario.Incluir(new Beneficiario()
+
+                        if (bo.VerificarExistencia(beneficiario.CPF))
                         {
-                            CPF = beneficiario.CPF,
-                            Nome = beneficiario.Nome,
-                            IdCliente = model.Id
-                        });
-                    }
-                    else
-                    {
-                        // Alterar beneficiário existente
-                        boBeneficiario.Alterar(new Beneficiario()
+                            Response.StatusCode = 400;
+                            return Json(new { sucesso = false, mensagem = "CPF já cadastrado para outro beneficiário deste cliente." });
+                        }
+
+                        if (beneficiario.Id == 0)
                         {
-                            Id = beneficiario.Id,
-                            CPF = beneficiario.CPF,
-                            Nome = beneficiario.Nome,
-                            IdCliente = model.Id
-                        });
+                            boBeneficiario.Incluir(new Beneficiario()
+                            {
+                                CPF = beneficiario.CPF,
+                                Nome = beneficiario.Nome,
+                                IdCliente = model.Id
+                            });
+                        }
+                        else
+                        {
+
+                            if (bo.VerificarExistencia(beneficiario.CPF))
+                            {
+                                Response.StatusCode = 400;
+                                return Json(new { sucesso = false, mensagem = "CPF já cadastrado para outro beneficiário deste cliente." });
+                            }
+
+                            boBeneficiario.Alterar(new Beneficiario()
+                            {
+
+                                Id = beneficiario.Id,
+                                CPF = beneficiario.CPF,
+                                Nome = beneficiario.Nome,
+                                IdCliente = model.Id
+                            });
+                        }
                     }
                 }
 

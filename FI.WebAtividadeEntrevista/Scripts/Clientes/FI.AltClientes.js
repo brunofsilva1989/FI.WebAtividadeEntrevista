@@ -20,15 +20,13 @@
         }
     }
 
-    $('#formCadastro').submit(function (e) {
+    console.log('Antes da submter o form')
+    $('#formCadastro').off('submit').on('submit',function (e) {
         e.preventDefault();
 
         console.log("Iniciando submissão do formulário de alteração.");
-
-        if ($('#tabelaBeneficiarios tbody tr').length === 0 && !$('#formCadastro #Id').val()) {
-            ModalDialog("Erro", "Nenhum beneficiário foi informado.");
-            return;
-        }
+        let clienteId = $('#formCadastro').find("#Id").val();
+        
 
         let beneficiarios = [];
         $('#tabelaBeneficiarios tbody tr').each(function () {
@@ -56,14 +54,12 @@
             }),
             contentType: "application/json; charset=utf-8",
             dataType: "json",
-            success: function (r) {
-                console.log("Resposta do servidor recebida:", r);
-
+            success: function (r) {                
                 if (r.sucesso) {
                     ModalDialog("Sucesso!", r.mensagem);
-                    $("#formCadastro")[0].reset();
-                    beneficiarios = [];
-                    atualizarTabelaBeneficiarios();
+                    setTimeout(function () {
+                        window.location.href = '/Cliente/Index';
+                    }, 2000); 
                 } else {
                     ModalDialog("Erro", r.mensagem || "Erro ao processar o cadastro.");
                 }
